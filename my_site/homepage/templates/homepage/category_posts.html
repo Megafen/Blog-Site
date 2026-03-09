@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Категория: {{ category.name }}</h1>
+    {% if posts %}
+        <div class="row">
+            {% for post in posts %}
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        {% if post.main_image %}
+                            <img src="{{ post.main_image.url }}" class="card-img-top" alt="{{ post.title }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{% url 'post_detail' post.id %}" class="text-decoration-none text-dark">{{ post.title }}</a>
+                            </h5>
+                            <p class="card-text">{{ post.content|striptags|truncatechars:200 }}</p>
+                            <p class="text-muted small">{{ post.published_date|date:"d E Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>В этой категории пока нет статей.</p>
+    {% endif %}
+{% endblock %}

@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Post, Comment, Like
+from .models import Post, Comment, Like, Category
 from .forms import CommentForm
 
 
@@ -29,6 +29,12 @@ def post_detail(request, post_id):
         'user_like': user_like,
     }
     return render(request, 'homepage/post_detail.html', context)
+
+
+def category_posts(request, slug):
+    category = get_object_or_404(Category, slug=slug)
+    posts = Post.objects.filter(category=category).order_by('-published_date')
+    return render(request, 'homepage/category_posts.html', {'category': category, 'posts': posts})
 
 
 @login_required

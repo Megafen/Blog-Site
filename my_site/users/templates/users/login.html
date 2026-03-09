@@ -1,14 +1,51 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <h2>Вход</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Войти</button>
-        </form>
-        <p class="mt-3">Нет аккаунта? <a href="{% url 'register' %}">Зарегистрируйтесь</a></p>
-    </div>
+  <div class="col-md-6">
+    <h2 class="mb-4">Пожалуйста войдите</h2>   <!-- заголовок как на втором скрине -->
+    
+    <form method="post">
+      {% csrf_token %}
+      
+      <!-- Поле username (можно назвать Email) -->
+      <div class="mb-3">
+        <label for="{{ form.username.id_for_label }}" class="form-label">Login</label>
+        <input type="text" 
+               name="{{ form.username.name }}" 
+               id="{{ form.username.id_for_label }}" 
+               class="form-control" 
+               placeholder="Введите email"
+               value="{{ form.username.value|default:'' }}">
+        {% if form.username.errors %}
+          <div class="text-danger small">{{ form.username.errors }}</div>
+        {% endif %}
+      </div>
+      
+      <!-- Поле password -->
+      <div class="mb-3">
+        <label for="{{ form.password.id_for_label }}" class="form-label">Пароль</label>
+        <input type="password" 
+               name="{{ form.password.name }}" 
+               id="{{ form.password.id_for_label }}" 
+               class="form-control" 
+               placeholder="Введите пароль">
+        {% if form.password.errors %}
+          <div class="text-danger small">{{ form.password.errors }}</div>
+        {% endif %}
+      </div>
+      
+      <!-- Чекбокс "Запомнить меня" (добавляем вручную) -->
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="remember" name="remember">
+        <label class="form-check-label" for="remember">Запомнить меня</label>
+      </div>
+      
+      <!-- Кнопка входа -->
+      <button type="submit" class="btn btn-primary w-100">Войти</button>
+      
+      <!-- Ссылка на регистрацию -->
+      <p class="mt-3">Нет аккаунта? <a href="{% url 'register' %}">Зарегистрируйтесь</a></p>
+    </form>
+  </div>
 </div>
 {% endblock %}

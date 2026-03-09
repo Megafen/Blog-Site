@@ -1,16 +1,31 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User  # импортируем модель пользователя
+from ckeditor_uploader.fields import RichTextUploadingField
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=50, unique=True, verbose_name='Название')
+    slug = models.SlugField(max_length=50, unique=True, verbose_name='URL')  # для удобных ссылок
+    order = models.PositiveIntegerField(default=0, verbose_name='Порядок')   # для сортировки в сайдбаре
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+        ordering = ['order', 'name']  # сортировка по полю order, затем по имени
 
 
 class Post(models.Model):
     title = models.CharField(max_length=200, verbose_name='Заголовок')
-    content = models.TextField(verbose_name='Содержание')
+    content = RichTextUploadingField(verbose_name='Содержание')
+    main_image = models.ImageField(upload_to='post_main/', blank=True, null=True, verbose_name='Главное изображение')
     published_date = models.DateTimeField(default=timezone.now, verbose_name='Дата публикации')
-
-    # Добавим поля для подсчёта лайков и дизлайков (чтобы не вычислять каждый раз)
     total_likes = models.PositiveIntegerField(default=0, verbose_name='Всего лайков')
     total_dislikes = models.PositiveIntegerField(default=0, verbose_name='Всего дизлайков')
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts', verbose_name='Категория')
 
     def __str__(self):
         return self.title
