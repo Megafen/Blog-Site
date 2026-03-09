@@ -1,13 +1,53 @@
 {% extends 'base.html' %}
-{% block title %}{{ post.title }}{% endblock %}
 {% block content %}
-    <article>
-        <h1>{{ post.title }}</h1>
-        <p class="text-muted">Опубликовано: {{ post.published_date|date:"d E Y H:i" }}</p>
-        <hr>
-        <div class="post-content">
-            {{ post.content|linebreaks }}  <!-- linebreaks преобразует переносы строк в <br> и <p> -->
-        </div>
-        <a href="{% url 'homepage' %}" class="btn btn-secondary mt-4">← Назад к списку</a>
-    </article>
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <article class="mb-5">
+            <h1>{{ post.title }}</h1>
+            <p class="text-muted">{{ post.published_date|date:"d E Y H:i" }}</p>
+            <div class="post-content">
+                {{ post.content|linebreaks }}
+            </div>
+
+            <!-- Блок лайков/дизлайков -->
+            <div class="d-flex align-items-center mt-4">
+                <form action="{% url 'like_post' post.id 'like' %}" method="post" class="me-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn {% if user_like == 1 %}btn-success{% else %}btn-outline-success{% endif %} btn-sm">
+                        👍 Лайк <span class="badge bg-light text-dark">{{ post.total_likes }}</span>
+                    </button>
+                </form>
+                <form action="{% url 'like_post' post.id 'dislike' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn {% if user_like == -1 %}btn-danger{% else %}btn-outline-danger{% endif %} btn-sm">
+                        👎 Дизлайк <span class="badge bg-light text-dark">{{ post.total_dislikes }}</span>
+                    </button>
+                </form>
+            </div>
+        </article>
+
+        <!-- Секция комментариев -->
+        <section class="comments">
+            <h3>Комментарии</h3>
+
+            {% if user.is_authenticated %}
+                <!-- Форма нового комментария -->
+                <form action="{% url 'add_comment' post.id %}" method="post" class="mb-4">
+                    {% csrf_token %}
+                    {{ comment_form.as_p }}
+                    <button type="submit" class="btn btn-primary">Отправить</button>
+                </form>
+            {% else %}
+                <p><a href="{% url 'login' %}">Войдите</a>, чтобы оставить комментарий.</p>
+            {% endif %}
+
+            <!-- Список комментариев -->
+            {% for comment in comments %}
+                {% include 'homepage/comment_item.html' with comment=comment %}
+            {% empty %}
+                <p>Пока нет комментариев. Будьте первым!</p>
+            {% endfor %}
+        </section>
+    </div>
+</div>
 {% endblock %}
